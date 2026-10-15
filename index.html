@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NLCS Game 4 — Dodgers vs Brewers: The Data Case for Both Sides</title>
+<style>
+  :root{
+    --bg:#0b0e14; --card:#141926; --card2:#1a2133; --line:#26314a;
+    --lad:#4f8ff7; --lad-dk:#1c3a6e; --mil:#f2b33d; --mil-dk:#5c4310;
+    --txt:#e8edf7; --dim:#93a1bb; --good:#3ecf7a; --bad:#f7634f; --mid:#f2b33d;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--txt); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; line-height:1.5; padding:16px; max-width:980px; margin:0 auto;}
+  header{text-align:center; padding:18px 8px 6px;}
+  .kicker{color:var(--dim); font-size:12px; letter-spacing:2.5px; text-transform:uppercase;}
+  h1{font-size:30px; margin:6px 0 2px; line-height:1.15;}
+  h1 .la{color:var(--lad);} h1 .mw{color:var(--mil);}
+  .sub{color:var(--dim); font-size:14px;}
+  .series{display:flex; justify-content:center; gap:8px; margin:14px 0 4px; flex-wrap:wrap;}
+  .g{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:7px 12px; font-size:13px;}
+  .g b{color:var(--mil);}
+  .g.next{border-color:var(--lad); color:#fff;}
+  .odds{display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin:10px 0 18px;}
+  .odds span{background:var(--card2); border-radius:20px; padding:5px 12px; font-size:13px; color:var(--dim);}
+  .odds span b{color:var(--txt);}
+  h2{font-size:19px; margin:26px 0 12px; display:flex; align-items:center; gap:8px;}
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:720px){ .cols{grid-template-columns:1fr;} h1{font-size:25px;} }
+  .case{border-radius:16px; padding:18px; border:1px solid var(--line);}
+  .case.la{background:linear-gradient(160deg,#12233f,#0e1626);}
+  .case.mw{background:linear-gradient(160deg,#38300f,#171307);}
+  .case h3{font-size:21px; margin-bottom:2px;}
+  .case.la h3{color:var(--lad);} .case.mw h3{color:var(--mil);}
+  .case .tag{color:var(--dim); font-size:13px; margin-bottom:12px;}
+  .case ul{list-style:none;}
+  .case li{padding:9px 0 9px 22px; position:relative; border-top:1px solid rgba(255,255,255,.07); font-size:14.5px;}
+  .case li:first-child{border-top:none;}
+  .case li::before{content:"▸"; position:absolute; left:2px;}
+  .case.la li::before{color:var(--lad);} .case.mw li::before{color:var(--mil);}
+  .case li b{color:#fff;}
+  .statline{display:flex; justify-content:space-between; font-size:12.5px; color:var(--dim); margin-top:2px;}
+  .bar{height:7px; background:#0a0f18; border-radius:4px; margin:5px 0 3px; overflow:hidden;}
+  .bar i{display:block; height:100%; border-radius:4px;}
+  .la .bar i{background:var(--lad);} .mw .bar i{background:var(--mil);}
+  table{width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; font-size:14px;}
+  th,td{padding:10px 12px; text-align:left; border-top:1px solid var(--line);}
+  th{background:var(--card2); font-size:12px; letter-spacing:1px; text-transform:uppercase; color:var(--dim);}
+  tr:first-child td{border-top:none;}
+  td.la{color:var(--lad); font-weight:600;} td.mw{color:var(--mil); font-weight:600;}
+  .win{color:var(--good); font-weight:700;}
+  .hist{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media (max-width:720px){ .hist{grid-template-columns:repeat(2,1fr);} }
+  .hcard{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center;}
+  .hcard .n{font-size:30px; font-weight:800;}
+  .hcard .l{font-size:12.5px; color:var(--dim); margin-top:2px;}
+  .note{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; font-size:14.5px; margin-top:12px;}
+  .note b{color:#fff;}
+  .verdict{border:1px solid var(--lad); background:linear-gradient(160deg,#12233f,#0d1524); border-radius:16px; padding:18px; margin-top:14px;}
+  .verdict h3{color:var(--lad); font-size:18px; margin-bottom:6px;}
+  .verdict p{font-size:15px;}
+  .verdict .series-call{margin-top:10px; padding-top:10px; border-top:1px solid var(--line);}
+  .verdict .series-call h4{color:var(--mil); font-size:15px; margin-bottom:4px;}
+  footer{color:var(--dim); font-size:12px; text-align:center; margin:26px 0 10px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">NLCS · Game 4 · Elimination Game</div>
+  <h1><span class="la">Dodgers</span> vs <span class="mw">Brewers</span></h1>
+  <div class="sub">Thursday, Oct 15, 2026 · 8:00 PM ET · Dodger Stadium · FS1</div>
+  <div class="series">
+    <div class="g">G1 · <b>MIL 2–1</b></div>
+    <div class="g">G2 · <b>MIL 7–4</b></div>
+    <div class="g">G3 · <b>MIL 6–2</b></div>
+    <div class="g next">G4 · Brewers lead 3–0</div>
+  </div>
+  <div class="odds">
+    <span>Moneyline <b>LAD −156</b> · MIL +132</span>
+    <span>Total <b>7.5</b></span>
+    <span>Model win % tonight <b>Dodgers 64.2%</b> (numberFire)</span>
+  </div>
+</header>
+
+<div class="cols">
+  <section class="case la">
+    <h3>The case for the Dodgers</h3>
+    <div class="tag">Tonight is a pitching mismatch — and history says this club lives for elimination games.</div>
+    <ul>
+      <li><b>Glasnow owns this lineup.</b> Current Brewers hitters have produced a .176 expected wOBA and .058 expected ISO against Tyler Glasnow, with a 40.4% strikeout rate.
+        <div class="bar"><i style="width:82%"></i></div>
+        <div class="statline"><span>Brewers xwOBA vs Glasnow</span><span>.176 (elite suppression)</span></div></li>
+      <li><b>His recent form vs Milwaukee is dominant.</b> Glasnow's last three starts against the Brewers as a Dodger (incl. 2025 NLCS Game 3): 16⅔ IP, 2 ER — a 1.08 ERA. The ugly career line (0–3, 4.55) is a 2017 Pirates artifact.</li>
+      <li><b>Milwaukee has no starter.</b> The Brewers are running a bullpen game, opening with lefty Shane Drohan. Nine innings of relievers against a desperate lineup, with no margin for one bad arm.</li>
+      <li><b>Elimination-game pedigree.</b> Under Dave Roberts since 2016, the Dodgers are 15–7 (.682) when facing elimination — the rest of MLB is .444. They've won their last four elimination games straight.
+        <div class="bar"><i style="width:68%"></i></div>
+        <div class="statline"><span>LAD win % facing elimination</span><span>.682</span></div></li>
+      <li><b>The bats are due — the data says so.</b> LA's postseason xwOBA is .321 but its actual wOBA is .264, with a .216 BABIP despite a 41.7% hard-hit rate. That's bad luck, not bad hitting, and it regresses.
+        <div class="bar"><i style="width:64%"></i></div>
+        <div class="statline"><span>xwOBA .321 vs wOBA .264</span><span>gap = positive regression coming</span></div></li>
+      <li><b>The market still believes.</b> Down 0–3, at home, LA is still a −156 favorite tonight — the only number that has to cash tonight.</li>
+    </ul>
+  </section>
+
+  <section class="case mw">
+    <h3>The case for the Brewers</h3>
+    <div class="tag">Three games of control, a historically fatal hole, and a Dodgers offense that has gone silent.</div>
+    <ul>
+      <li><b>Total series control.</b> Milwaukee has outscored LA 15–7 and held the Dodgers to 3 hits in Game 2 and 5 hits in Game 3. Every time LA scores, the Brewers answer.</li>
+      <li><b>The Dodgers' bats are ice cold.</b> Team OPS has collapsed from .767 in the regular season to .591 this postseason — 21 runs in 7 games. Will Smith is hitting .074, Shohei Ohtani .182, and Betts/Freeman/Teoscar went 1-for-11 in Game 3.
+        <div class="bar"><i style="width:59%"></i></div>
+        <div class="statline"><span>Dodgers postseason OPS</span><span>.591 (was .767)</span></div></li>
+      <li><b>Milwaukee's bats are the hot ones.</b> William Contreras is hitting .370 with 3 HR this postseason. Chourio, Bauers and Mitchell all homered in Game 3 — Bauers winning an 11-pitch war against Snell.</li>
+      <li><b>Comeback kings.</b> The Brewers already have 5 comeback wins this postseason, tying the 1996 Yankees and 1980 Phillies for the most ever in a club's first seven playoff games.</li>
+      <li><b>Glasnow's command is a real risk.</b> He walked 5 in 4⅔ innings in his NLDS start. Milwaukee is the most patient lineup in the series — exactly the profile that turns walks into crooked numbers.</li>
+      <li><b>History is a landslide.</b> Teams up 3–0 in a best-of-seven have won 41 of 42 series (97.6%). The Brewers don't need tonight — they have four chances to get one win.
+        <div class="bar"><i style="width:98%"></i></div>
+        <div class="statline"><span>3–0 team series win rate</span><span>41 of 42</span></div></li>
+    </ul>
+  </section>
+</div>
+
+<h2>⚾ Pitching comparison — the historical data</h2>
+<table>
+  <tr><th>Pitcher</th><th>Line</th><th>Read</th></tr>
+  <tr><td class="la">Tyler Glasnow — 2026 season</td><td>5–2 · 3.53 ERA · 0.95 WHIP · 98 K in 74 IP (13 starts)</td><td>Frontline stuff, limited workload</td></tr>
+  <tr><td class="la">Glasnow — career vs Brewers</td><td>0–3 · 4.55 ERA · 37 K in 31⅔ IP (9 apps)</td><td class="win">Misleading — mostly 2017, pre-prime</td></tr>
+  <tr><td class="la">Glasnow — last 3 vs Brewers (as a Dodger)</td><td>16⅔ IP · 2 ER · 1.08 ERA</td><td class="win">Dominant when it counts</td></tr>
+  <tr><td class="la">Glasnow — NLDS Game 4 (last start)</td><td>4⅔ IP · 1 ER · 5 BB</td><td>Effective but wild — short leash tonight</td></tr>
+  <tr><td class="mw">Brewers — Game 4 plan</td><td>Bullpen game · opener: LHP Shane Drohan</td><td>No length; one bad inning can break it</td></tr>
+  <tr><td class="mw">Brewers bullpen — Game 2</td><td>Did not allow a hit</td><td class="win">The pen has been lights-out all series</td></tr>
+</table>
+
+<h2>📜 The 0–3 hole — and the back-to-back home loss problem</h2>
+<div class="hist">
+  <div class="hcard"><div class="n">42</div><div class="l">previous 0–3 holes in best-of-seven MLB history</div></div>
+  <div class="hcard"><div class="n">32</div><div class="l">ended in a sweep (76%) — tonight decides No. 33</div></div>
+  <div class="hcard"><div class="n">10</div><div class="l">won Game 4 to stay alive — only 1 (2004 Red Sox) won the series</div></div>
+  <div class="hcard"><div class="n">1966</div><div class="l">the only other time the Dodgers trailed 0–3 — swept by Baltimore</div></div>
+</div>
+<div class="note">
+  <b>The favorite's trap:</b> the Dodgers entered this series as the two-time defending champions and series favorites, dropped both games in Milwaukee, then lost Game 3 at home 6–2. A loss tonight makes it <b>back-to-back home losses to end a series they were favored to win</b> — historically, teams in an 0–3 hole playing Game 4 at home have usually only delayed the end: of the 10 teams that avoided a sweep, six still lost in five games. The honest slice of history: winning tonight is plausible (the 10-for-42 Game 4 rate plus LA's elimination pedigree), winning the series is a 1-in-42 proposition. No NL team has ever completed the 0–3 comeback.
+</div>
+
+<h2>📊 Recent form</h2>
+<table>
+  <tr><th>Team</th><th>Record</th><th>This series</th><th>Postseason snapshot</th></tr>
+  <tr><td class="mw">Brewers</td><td>103–59 (best in MLB)</td><td>3–0 · outscored LAD 15–7</td><td>5 comeback wins · Contreras .370 / 3 HR</td></tr>
+  <tr><td class="la">Dodgers</td><td>100–62</td><td>0–3 · 8 hits total in Games 2–3</td><td>.591 team OPS · 21 runs in 7 games</td></tr>
+</table>
+
+<div class="verdict">
+  <h3>Verdict — tonight: Dodgers</h3>
+  <p>The single-game data points one way: an ace who has suffocated this exact lineup (1.08 ERA in his last three starts against them, 40.4% K rate), facing a bullpen game, at home, on a team that wins elimination games at a .682 clip — with an offense whose underlying contact quality (.321 xwOBA) says the hits are coming. That's why the model makes LA a 64% favorite tonight.</p>
+  <div class="series-call">
+    <h4>The series: Brewers, overwhelmingly</h4>
+    <p>History gives the Dodgers a 1-in-42 path, Milwaukee hasn't lost four straight since April, and the Brewers get four cracks at one win. Take LA tonight if you're playing the game — respect the math on the series.</p>
+  </div>
+</div>
+
+<footer>Built Oct 15, 2026 · Data: FanDuel, Covers/numberFire, USA Today, StatMuse, True Blue LA · Lines move — check before first pitch (8:00 PM ET, FS1).</footer>
+
+</body>
+</html>
